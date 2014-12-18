@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace AssociativeRules
+namespace Apriori
 {
     public class Apriori<T> where T : IComparable
     {

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Apriori;
 
 namespace AssociativeRules
 {
@@ -28,9 +29,9 @@ namespace AssociativeRules
         {
             var itemSets = new List<ItemSet<string>>
                 {
-                    new ItemSet<string>(new [] { "a", "b", "c" }),
-                    new ItemSet<string>(new [] { "b", "a" }),
-                    new ItemSet<string>(new [] { "d", "a", "e" })
+                    new ItemSet<string>("a", "b", "c"),
+                    new ItemSet<string>("b", "a"),
+                    new ItemSet<string>("d", "a", "e")
                 };
 
             return itemSets;

@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace AssociativeRules
+namespace Apriori
 {
-    public static class ItemSetHelpers
+    public static class Utils
     {
         public static List<ItemSet<T>> SelfJoin<T>(this List<ItemSet<T>> sets) where T : IComparable
         {

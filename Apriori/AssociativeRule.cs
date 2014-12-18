@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace AssociativeRules
+namespace Apriori
 {
     public class AssociativeRule<T> where T : IComparable
     {

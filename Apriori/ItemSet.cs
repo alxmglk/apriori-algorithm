@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 
-namespace AssociativeRules
+namespace Apriori
 {
     public class ItemSet<T> where T : IComparable
     {
