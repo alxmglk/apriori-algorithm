@@ -44,8 +44,7 @@ namespace AssociativeRules
 
             while (true)
             {
-                var selfJoinResult = ItemSetHelpers
-                    .SelfJoin(sets)
+                var selfJoinResult = sets.SelfJoin()
                     .ToList();
 
                 if (selfJoinResult.Any() && selfJoinResult.First().Size > maxSetSize)

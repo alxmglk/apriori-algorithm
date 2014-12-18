@@ -4,8 +4,7 @@ using System.Linq;
 
 namespace AssociativeRules
 {
-    public class Apriori<T>
-        where T : IComparable
+    public class Apriori<T> where T : IComparable
     {
         private readonly Dictionary<int, int> _supportLevels;
         private readonly IEnumerable<ItemSet<T>> _analyzableItemSets;
@@ -22,12 +21,19 @@ namespace AssociativeRules
 
         public IEnumerable<AssociativeRule<T>> GetAssociativeRules()
         {
+            var frequentItemSets = GetFrequentItemSets();
+
+            return GetAssociativeRules(frequentItemSets);
+        }
+
+        public IEnumerable<ItemSet<T>> GetFrequentItemSets()
+        {
             var itemSets = new List<ItemSet<T>>();
             var currentItemSets = GetSingleItemSets(_analyzableItemSets);
 
             while (true)
             {
-                var filteredSets = ClearItemSets(currentItemSets, _analyzableItemSets, _supportTreshold, _supportLevels);
+                var filteredSets = ClearItemSets(currentItemSets);
                 if (!filteredSets.Any())
                 {
                     break;
@@ -35,10 +41,10 @@ namespace AssociativeRules
 
                 itemSets.AddRange(filteredSets);
 
-                currentItemSets = ItemSetHelpers.SelfJoin(filteredSets);
+                currentItemSets = filteredSets.SelfJoin();
             }
 
-            return GetAssociativeRules(itemSets, _confidenceTreshold, _supportLevels);
+            return itemSets;
         }
 
         private List<ItemSet<T>> GetSingleItemSets(IEnumerable<ItemSet<T>> itemSets)
@@ -52,27 +58,26 @@ namespace AssociativeRules
                 .ToList();
         }
 
-        private List<ItemSet<T>> ClearItemSets(IEnumerable<ItemSet<T>> itemSets, IEnumerable<ItemSet<T>> analyzableItemSets,
-            double supportLevel, Dictionary<int, int> supportLevels)
+        private List<ItemSet<T>> ClearItemSets(IEnumerable<ItemSet<T>> itemSets)
         {
             var result = new List<ItemSet<T>>();
-            var totalCount = analyzableItemSets.Count();
+            var totalCount = _analyzableItemSets.Count();
 
             foreach (var itemSet in itemSets)
             {
-                var count = analyzableItemSets.Count(analyzableSet => analyzableSet.Contain(itemSet));
+                var count = _analyzableItemSets.Count(analyzableSet => analyzableSet.Contain(itemSet));
 
-                if (count / (double)totalCount >= supportLevel)
+                if (count / (double)totalCount >= _supportTreshold)
                 {
                     result.Add(itemSet);
-                    supportLevels[itemSet.GetHashCode()] = count;
+                    _supportLevels[itemSet.GetHashCode()] = count;
                 }
             }
 
             return result;
         }
 
-        private IEnumerable<AssociativeRule<T>> GetAssociativeRules(IEnumerable<ItemSet<T>> itemSets, double confidenceLevel, Dictionary<int, int> supportLevels)
+        private IEnumerable<AssociativeRule<T>> GetAssociativeRules(IEnumerable<ItemSet<T>> itemSets)
         {
             var associativeRules = new List<AssociativeRule<T>>();
 
@@ -84,15 +89,15 @@ namespace AssociativeRules
                 }
 
                 var subsets = item.GetAllSubsets();
-                var itemSupportLevel = supportLevels[item.GetHashCode()];
+                var itemSupportLevel = _supportLevels[item.GetHashCode()];
 
                 foreach (var subset in subsets)
                 {
-                    var subsetSupportLevel = supportLevels[subset.GetHashCode()];
+                    var subsetSupportLevel = _supportLevels[subset.GetHashCode()];
 
                     var confidence = itemSupportLevel / (double)subsetSupportLevel;
 
-                    if (confidence < confidenceLevel)
+                    if (confidence < _confidenceTreshold)
                     {
                         continue;
                     }
