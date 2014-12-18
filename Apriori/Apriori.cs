@@ -1,19 +1,21 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Apriori
 {
     public class Apriori<T> where T : IComparable
     {
         private readonly Dictionary<int, int> _supportLevels;
-        private readonly IEnumerable<ItemSet<T>> _analyzableItemSets;
+        private readonly List<ItemSet<T>> _analyzableItemSets;
         private readonly double _supportTreshold;
         private readonly double _confidenceTreshold;
 
         public Apriori(IEnumerable<ItemSet<T>> analyzableItemSets, double supportTreshold, double confidenceTreshold)
         {
-            _analyzableItemSets = analyzableItemSets;
+            _analyzableItemSets = analyzableItemSets.ToList();
             _supportLevels = new Dictionary<int, int>();
             _supportTreshold = supportTreshold;
             _confidenceTreshold = confidenceTreshold;
@@ -49,32 +51,38 @@ namespace Apriori
 
         private List<ItemSet<T>> GetSingleItemSets(IEnumerable<ItemSet<T>> itemSets)
         {
-            IEnumerable<T> distinctItems = new List<T>();
+            var uniqueItems = new HashSet<T>();
+            var items = itemSets.SelectMany(x => x);
 
-            distinctItems = itemSets.Aggregate(distinctItems, (current, itemSet) => current.Union(itemSet.Items));
+            foreach (var item in items)
+            {
+                if (!uniqueItems.Contains(item))
+                {
+                    uniqueItems.Add(item);
+                }
+            }
 
-            return distinctItems
+            return uniqueItems
                 .Select(x => new ItemSet<T>(x))
                 .ToList();
         }
 
         private List<ItemSet<T>> ClearItemSets(IEnumerable<ItemSet<T>> itemSets)
         {
-            var result = new List<ItemSet<T>>();
+            var result = new ConcurrentBag<ItemSet<T>>();
             var totalCount = _analyzableItemSets.Count();
 
-            foreach (var itemSet in itemSets)
+            Parallel.ForEach(itemSets, set =>
             {
-                var count = _analyzableItemSets.Count(analyzableSet => analyzableSet.Contain(itemSet));
-
+                var count = _analyzableItemSets.Count(analyzableSet => analyzableSet.Contains(set));
                 if (count / (double)totalCount >= _supportTreshold)
                 {
-                    result.Add(itemSet);
-                    _supportLevels[itemSet.GetHashCode()] = count;
+                    result.Add(set);
+                    _supportLevels[set.GetHashCode()] = count;
                 }
-            }
+            });
 
-            return result;
+            return result.ToList();
         }
 
         private IEnumerable<AssociativeRule<T>> GetAssociativeRules(IEnumerable<ItemSet<T>> itemSets)

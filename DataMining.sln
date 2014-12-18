@@ -9,6 +9,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Algorithms", "Algorithms", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Apriori", "Apriori\Apriori.csproj", "{FE062357-A0BA-4AE6-8D0B-DB19CCD87FDA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FrequentItemSets", "FrequentItemSets\FrequentItemSets.csproj", "{10D829AF-F127-4EB3-AD8C-F31B23A298F4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,6 +25,10 @@ Global
 		{FE062357-A0BA-4AE6-8D0B-DB19CCD87FDA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FE062357-A0BA-4AE6-8D0B-DB19CCD87FDA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FE062357-A0BA-4AE6-8D0B-DB19CCD87FDA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{10D829AF-F127-4EB3-AD8C-F31B23A298F4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{10D829AF-F127-4EB3-AD8C-F31B23A298F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{10D829AF-F127-4EB3-AD8C-F31B23A298F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{10D829AF-F127-4EB3-AD8C-F31B23A298F4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

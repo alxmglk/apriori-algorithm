@@ -15,11 +15,10 @@ namespace Apriori
                 for (var j = i + 1; j < sets.Count; ++j)
                 {
                     var items = sets[i]
-                        .Items
-                        .Union(sets[j].Items)
+                        .Union(sets[j])
                         .ToList();
 
-                    if (items.Count == sets[i].Items.Count + 1)
+                    if (items.Count == sets[i].Size + 1)
                     {
                         result.Add(new ItemSet<T>(items));
                     }

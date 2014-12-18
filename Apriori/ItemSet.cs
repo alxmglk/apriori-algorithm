@@ -1,30 +1,22 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 
 namespace Apriori
 {
-    public class ItemSet<T> where T : IComparable
+    public class ItemSet<T> : IEnumerable<T> where T : IComparable
     {
-        private readonly List<T> _items;
+        private readonly HashSet<T> _items;
 
         public ItemSet(IEnumerable<T> items)
         {
-            _items = items.Distinct().ToList();
+            _items = new HashSet<T>(items.Distinct());
         }
 
         public ItemSet(params T[] items)
         {
-            _items = items.Distinct().ToList();
-        }
-
-        public IList<T> Items
-        {
-            get
-            {
-                return new ReadOnlyCollection<T>(_items);
-            }
+            _items = new HashSet<T>(items.Distinct());
         }
 
         public int Size
@@ -59,39 +51,39 @@ namespace Apriori
             return result;
         }
 
-        public bool Contain(ItemSet<T> itemSet)
+        public bool Contains(ItemSet<T> itemSet)
         {
-            foreach (var item in itemSet._items)
-            {
-                if (_items.All(x => x.CompareTo(item) != 0))
-                {
-                    return false;
-                }
-            }
+            return itemSet.All(x => _items.Contains(x));
+        }
 
-            return true;
+        public bool Contains(T item)
+        {
+            return _items.Contains(item);
         }
 
         public ItemSet<T> Subtract(ItemSet<T> itemSet)
         {
-            var result = new List<T>();
-
-            foreach (var item in _items)
-            {
-                if (!itemSet.Items.Contains(item))
-                {
-                    result.Add(item);
-                }
-            }
+            var result = _items
+                .Where(item => !itemSet.Contains(item))
+                .ToList();
 
             return new ItemSet<T>(result);
         }
 
         public ItemSet<T> Union(ItemSet<T> itemSet)
         {
-            var result = _items.Union(itemSet.Items);
+            var result = _items.Union(itemSet);
 
             return new ItemSet<T>(result);
+        }
+
+        IEnumerator<T> IEnumerable<T>.GetEnumerator()
+        {
+            return _items.GetEnumerator();
+        }
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return _items.GetEnumerator();
         }
 
         public override int GetHashCode()
@@ -116,16 +108,6 @@ namespace Apriori
         public override string ToString()
         {
             return _items.Aggregate(string.Empty, (current, item) => current + (item + " "));
-        }
-
-        public static bool operator ==(ItemSet<T> first, ItemSet<T> second)
-        {
-            return !(first != second);
-        }
-
-        public static bool operator !=(ItemSet<T> first, ItemSet<T> second)
-        {
-            return !(first.GetHashCode() == second.GetHashCode());
         }
     }
 }
