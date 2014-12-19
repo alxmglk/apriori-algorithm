@@ -8,7 +8,7 @@ namespace Apriori
 {
     public class Apriori<T> where T : IComparable
     {
-        private readonly Dictionary<int, int> _supportLevels;
+        private readonly IDictionary<int, int> _supportLevels;
         private readonly List<ItemSet<T>> _analyzableItemSets;
         private readonly double _supportTreshold;
         private readonly double _confidenceTreshold;
@@ -16,7 +16,7 @@ namespace Apriori
         public Apriori(IEnumerable<ItemSet<T>> analyzableItemSets, double supportTreshold, double confidenceTreshold)
         {
             _analyzableItemSets = analyzableItemSets.ToList();
-            _supportLevels = new Dictionary<int, int>();
+            _supportLevels = new ConcurrentDictionary<int, int>();
             _supportTreshold = supportTreshold;
             _confidenceTreshold = confidenceTreshold;
         }
@@ -74,11 +74,17 @@ namespace Apriori
 
             Parallel.ForEach(itemSets, set =>
             {
-                var count = _analyzableItemSets.Count(analyzableSet => analyzableSet.Contains(set));
+                var setHashCode = set.GetHashCode();
+
+                if (!_supportLevels.ContainsKey(setHashCode))
+                {
+                    _supportLevels[setHashCode] = _analyzableItemSets.Count(analyzableSet => analyzableSet.Contains(set));
+                }
+
+                var count = _supportLevels[setHashCode];
                 if (count / (double)totalCount >= _supportTreshold)
                 {
                     result.Add(set);
-                    _supportLevels[set.GetHashCode()] = count;
                 }
             });
 

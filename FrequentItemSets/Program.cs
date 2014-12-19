@@ -8,7 +8,7 @@ namespace FrequentItemSets
 {
     public class Program
     {
-        private const double Support = 0.01;
+        private const double Support = 0.07;
 
         public static void Main()
         {
@@ -24,6 +24,7 @@ namespace FrequentItemSets
                 Console.WriteLine(mostFrequentSet);
             }
 
+            Console.WriteLine("Execution finished");
             Console.ReadKey();
         }
 
